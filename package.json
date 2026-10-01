@@ -27,6 +27,6 @@
     "sign:firefox": "npm run build:firefox && web-ext sign --channel unlisted --source-dir dist/firefox --artifacts-dir artifacts"
   },
   "devDependencies": {
-    "web-ext": "^8.0.0"
+    "web-ext": "^10.7.0"
   }
 }
