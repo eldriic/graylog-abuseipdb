@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="../icons/icon.svg" alt="" width="22" height="22">
+    <h1>AbuseIPDB Lookup</h1>
+    <button id="openOptions" class="icon-btn" title="Paramètres">⚙</button>
+  </header>
+
+  <div id="noKey" class="banner" hidden>
+    Aucune clé API configurée. <a href="#" id="noKeyLink">Ouvrir les paramètres</a>
+  </div>
+
+  <section>
+    <form id="lookupForm">
+      <input id="ipInput" type="text" placeholder="Vérifier une IP (ex : 8.8.8.8)" autocomplete="off" spellcheck="false">
+      <button type="submit">Vérifier</button>
+    </form>
+    <div id="lookupResult"></div>
+  </section>
+
+  <section>
+    <div class="section-title">
+      <span>IP sur cette page</span>
+      <span id="fieldName" class="muted"></span>
+    </div>
+    <div id="summary" class="summary"></div>
+    <ul id="ipList" class="ip-list"></ul>
+    <div id="emptyMsg" class="muted center" hidden></div>
+  </section>
+
+  <footer>
+    <div>
+      <div class="muted">Quota AbuseIPDB du jour</div>
+      <div class="quota-bar"><div id="quotaFill"></div></div>
+      <div id="quotaText" class="muted small"></div>
+    </div>
+    <button id="clearCache" class="secondary">Vider le cache</button>
+  </footer>
+
+  <template id="ipCardTpl">
+    <li class="ip-card">
+      <div class="ip-row">
+        <span class="score"></span>
+        <span class="ip"></span>
+        <span class="place muted"></span>
+        <span class="chevron" title="Voir les détails">▶</span>
+      </div>
+      <div class="details" hidden></div>
+    </li>
+  </template>
+
+  <script src="../shared/api.js"></script>
+  <script src="../shared/ip.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

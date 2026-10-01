@@ -1,0 +1,49 @@
+.abipdb-badge {
+  position: relative;
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: help;
+  color: #fff;
+}
+.abipdb-clean   { background: #2e7d32; }
+.abipdb-low     { background: #9e9d24; }
+.abipdb-medium  { background: #ef6c00; }
+.abipdb-high    { background: #c62828; }
+.abipdb-loading,
+.abipdb-private { background: #555; }
+.abipdb-error   { background: #6a1b9a; }
+
+.abipdb-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 99999;
+  min-width: 280px;
+  max-width: 420px;
+  padding: 8px 10px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #1e1e1e;
+  color: #ddd;
+  font-size: 12px;
+  font-weight: normal;
+  line-height: 1.5;
+  white-space: normal;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+}
+.abipdb-badge:hover .abipdb-tooltip { display: block; }
+.abipdb-tooltip-title {
+  margin-bottom: 4px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #fff;
+}
+.abipdb-tooltip b { color: #aaa; font-weight: 600; }
+.abipdb-tooltip a { display: inline-block; margin-top: 6px; color: #64b5f6; }

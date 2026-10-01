@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "minimum_chrome_version": "116",
+  "permissions": ["storage"],
+  "host_permissions": ["https://api.abuseipdb.com/*", "https://ipwho.is/*"],
+  "background": {
+    "service_worker": "background/background.js"
+  },
+  "action": {
+    "default_title": "AbuseIPDB Lookup",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    }
+  }
+}

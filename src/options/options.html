@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font: 14px sans-serif; padding: 12px; min-width: 380px; }
+    label { display: block; margin-top: 12px; font-weight: 600; }
+    input { width: 100%; box-sizing: border-box; padding: 5px; margin-top: 4px; }
+    small { color: #777; }
+    .actions { margin-top: 16px; display: flex; gap: 8px; align-items: center; }
+    #status { color: #2e7d32; }
+  </style>
+</head>
+<body>
+  <label>Clé API AbuseIPDB
+    <input id="apiKey" type="password" autocomplete="off">
+  </label>
+  <small>Créez-la sur abuseipdb.com → Account → API (gratuit : 1000 requêtes/jour).</small>
+
+  <label>Nom du champ Graylog
+    <input id="fieldName" type="text" placeholder="o365_audit_ClientIP">
+  </label>
+
+  <label>maxAgeInDays (historique des signalements)
+    <input id="maxAgeDays" type="number" min="1" max="365">
+  </label>
+
+  <label>Durée du cache (heures)
+    <input id="cacheHours" type="number" min="0">
+  </label>
+
+  <div class="actions">
+    <button id="save">Enregistrer</button>
+    <button id="clear">Vider le cache</button>
+    <span id="status"></span>
+  </div>
+  <script src="../shared/api.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

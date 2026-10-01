@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+artifacts/
+web-ext-artifacts/
+*.xpi
+*.zip
+
+# web-ext signing state
+.amo-upload-uuid
+
+# Secrets
+.env
+.env.*
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
