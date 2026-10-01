@@ -5,10 +5,9 @@
  * tables and expanded messages, and adds an AbuseIPDB badge next to each IP.
  */
 (() => {
-  const DEFAULT_FIELD = "o365_audit_ClientIP";
   const DONE_ATTR = "data-abipdb";
 
-  let fieldLabel = DEFAULT_FIELD;
+  let fieldLabel = Settings.DEFAULTS.fieldName;
   let fieldName = fieldLabel.toLowerCase();
 
   const normalize = (el) => el.textContent.replace(/\s+/g, " ").trim().toLowerCase();

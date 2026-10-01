@@ -2,30 +2,42 @@
  * Background script (Firefox event page / Chromium service worker).
  *
  * Performs every network lookup so requests are not subject to the Graylog
- * page's CORS / CSP rules, and caches results in storage.local.
+ * page's CORS / CSP rules, caches results in storage.local and records daily
+ * AbuseIPDB usage.
  */
 
 // Chromium service workers load shared helpers here; Firefox loads them via the manifest.
 if (typeof importScripts === "function") {
-  importScripts("/shared/api.js", "/shared/ip.js");
+  importScripts("/shared/api.js", "/shared/ip.js", "/shared/settings.js");
 }
 
-const DEFAULT_SETTINGS = { apiKey: "", maxAgeDays: 90, cacheHours: 24 };
 const CACHE_PREFIX = "cache:";
 const inflight = new Map();
 
-async function getSettings() {
-  const stored = await ext.storage.local.get(Object.keys(DEFAULT_SETTINGS));
-  return { ...DEFAULT_SETTINGS, ...stored };
+// Storage has no atomic increment: chain updates so parallel lookups don't lose counts.
+let usageQueue = Promise.resolve();
+
+function recordUsage() {
+  usageQueue = usageQueue.then(async () => {
+    const { usage = {} } = await ext.storage.local.get("usage");
+    const today = Settings.dayKey();
+    usage[today] = (usage[today] || 0) + 1;
+    const keep = new Set(Settings.lastDays(Settings.USAGE_RETENTION_DAYS));
+    for (const day of Object.keys(usage)) if (!keep.has(day)) delete usage[day];
+    await ext.storage.local.set({ usage });
+  });
+  return usageQueue;
 }
 
-async function fetchAbuse(ip, settings) {
+async function fetchAbuse(ip, { apiKey, maxAgeDays }) {
   const url =
     `https://api.abuseipdb.com/api/v2/check?ipAddress=${encodeURIComponent(ip)}` +
-    `&maxAgeInDays=${settings.maxAgeDays}&verbose`;
+    `&maxAgeInDays=${maxAgeDays}&verbose`;
   const res = await fetch(url, {
-    headers: { Key: settings.apiKey, Accept: "application/json" },
+    headers: { Key: apiKey, Accept: "application/json" },
   });
+  // Rejected requests (invalid key, rate limited) do not consume the quota.
+  if (res.ok) await recordUsage();
 
   const remaining = res.headers.get("X-RateLimit-Remaining");
   if (remaining !== null) {
@@ -54,7 +66,7 @@ async function fetchGeo(ip) {
 async function lookup(ip) {
   if (IpUtils.isPrivate(ip)) return { ip, private: true };
 
-  const settings = await getSettings();
+  const settings = await Settings.load();
   if (!settings.apiKey) {
     throw new Error("Clé API AbuseIPDB manquante (voir les paramètres de l'extension)");
   }
@@ -96,6 +108,13 @@ function lookupOnce(ip) {
   return inflight.get(ip);
 }
 
+/** Validates an API key with a single real request (counts against the quota). */
+async function testKey(apiKey) {
+  await fetchAbuse("8.8.8.8", { apiKey, maxAgeDays: 1 });
+  const { quota } = await ext.storage.local.get("quota");
+  return quota;
+}
+
 async function clearCache() {
   const all = await ext.storage.local.get(null);
   await ext.storage.local.remove(Object.keys(all).filter((k) => k.startsWith(CACHE_PREFIX)));
@@ -106,6 +125,12 @@ ext.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     case "lookup":
       lookupOnce(msg.ip).then(
         (data) => sendResponse({ ok: true, data }),
+        (err) => sendResponse({ ok: false, error: err.message }),
+      );
+      return true;
+    case "testKey":
+      testKey(msg.apiKey).then(
+        (quota) => sendResponse({ ok: true, quota }),
         (err) => sendResponse({ ok: false, error: err.message }),
       );
       return true;

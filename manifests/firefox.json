@@ -4,12 +4,25 @@
     "gecko": {
       "id": "graylog-abuseipdb@local",
       "strict_min_version": "142.0",
-      "data_collection_permissions": { "required": ["websiteContent"] }
+      "data_collection_permissions": {
+        "required": [
+          "websiteContent"
+        ]
+      }
     }
   },
-  "permissions": ["storage", "https://api.abuseipdb.com/*", "https://ipwho.is/*"],
+  "permissions": [
+    "storage",
+    "https://api.abuseipdb.com/*",
+    "https://ipwho.is/*"
+  ],
   "background": {
-    "scripts": ["shared/api.js", "shared/ip.js", "background/background.js"]
+    "scripts": [
+      "shared/api.js",
+      "shared/ip.js",
+      "shared/settings.js",
+      "background/background.js"
+    ]
   },
   "browser_action": {
     "default_title": "AbuseIPDB Lookup",

@@ -1,5 +1,6 @@
 /**
- * Toolbar popup: IPs found on the active tab, manual lookup, quota, settings.
+ * Toolbar popup: "Analyse" tab (IPs on the active tab, manual lookup) and
+ * "Paramètres" tab (shared settings panel).
  */
 const $ = (id) => document.getElementById(id);
 
@@ -124,21 +125,6 @@ async function loadPageIps() {
 
   renderSummary(results);
   $("ipList").replaceChildren(...results.map(buildCard));
-  renderQuota();
-}
-
-async function renderQuota() {
-  const { quota } = await ext.storage.local.get("quota");
-  if (!quota) {
-    $("quotaText").textContent = "Inconnu (aucune requête encore faite)";
-    return;
-  }
-  const pct = quota.limit ? (quota.remaining / quota.limit) * 100 : 0;
-  const fill = $("quotaFill");
-  fill.style.width = `${pct}%`;
-  fill.style.background = pct < 10 ? "var(--high)" : pct < 30 ? "var(--medium)" : "var(--clean)";
-  $("quotaText").textContent =
-    `${quota.remaining} / ${quota.limit} restantes · mis à jour ${new Date(quota.ts).toLocaleTimeString()}`;
 }
 
 $("lookupForm").addEventListener("submit", async (e) => {
@@ -154,25 +140,34 @@ $("lookupForm").addEventListener("submit", async (e) => {
   ul.className = "ip-list";
   ul.appendChild(card);
   out.replaceChildren(ul);
-  renderQuota();
 });
 
-const openOptions = (e) => {
+function showTab(name) {
+  for (const tab of document.querySelectorAll(".tab")) {
+    const active = tab.dataset.tab === name;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", active);
+    $(`tab-${tab.dataset.tab}`).hidden = !active;
+  }
+}
+
+for (const tab of document.querySelectorAll(".tab")) {
+  tab.addEventListener("click", () => showTab(tab.dataset.tab));
+}
+$("noKeyLink").addEventListener("click", (e) => {
   e.preventDefault();
-  ext.runtime.openOptionsPage();
-  window.close();
-};
-$("openOptions").addEventListener("click", openOptions);
-$("noKeyLink").addEventListener("click", openOptions);
-
-$("clearCache").addEventListener("click", async (e) => {
-  await ext.runtime.sendMessage({ type: "clearCache" });
-  e.target.textContent = "Cache vidé ✓";
-  setTimeout(() => (e.target.textContent = "Vider le cache"), 1500);
+  showTab("settings");
 });
 
-ext.storage.local.get("apiKey").then(({ apiKey }) => {
+SettingsPanel.mount($("tab-settings"));
+$("tab-settings").addEventListener("settings-saved", async () => {
+  const { apiKey } = await Settings.load();
   $("noKey").hidden = !!apiKey;
 });
-renderQuota();
+
+// Without an API key the only useful thing to do is configure it.
+Settings.load().then(({ apiKey }) => {
+  $("noKey").hidden = !!apiKey;
+  showTab(apiKey ? "analysis" : "settings");
+});
 loadPageIps();

@@ -8,39 +8,38 @@
   <header>
     <img src="../icons/icon.svg" alt="" width="22" height="22">
     <h1>AbuseIPDB Lookup</h1>
-    <button id="openOptions" class="icon-btn" title="Paramètres">⚙</button>
   </header>
 
-  <div id="noKey" class="banner" hidden>
-    Aucune clé API configurée. <a href="#" id="noKeyLink">Ouvrir les paramètres</a>
-  </div>
+  <nav class="tabs" role="tablist">
+    <button type="button" class="tab" role="tab" data-tab="analysis">Analyse</button>
+    <button type="button" class="tab" role="tab" data-tab="settings">Paramètres</button>
+  </nav>
 
-  <section>
-    <form id="lookupForm">
-      <input id="ipInput" type="text" placeholder="Vérifier une IP (ex : 8.8.8.8)" autocomplete="off" spellcheck="false">
-      <button type="submit">Vérifier</button>
-    </form>
-    <div id="lookupResult"></div>
-  </section>
-
-  <section>
-    <div class="section-title">
-      <span>IP sur cette page</span>
-      <span id="fieldName" class="muted"></span>
+  <main id="tab-analysis" role="tabpanel" hidden>
+    <div id="noKey" class="banner" hidden>
+      Aucune clé API configurée. <a href="#" id="noKeyLink">Ouvrir les paramètres</a>
     </div>
-    <div id="summary" class="summary"></div>
-    <ul id="ipList" class="ip-list"></ul>
-    <div id="emptyMsg" class="muted center" hidden></div>
-  </section>
 
-  <footer>
-    <div>
-      <div class="muted">Quota AbuseIPDB du jour</div>
-      <div class="quota-bar"><div id="quotaFill"></div></div>
-      <div id="quotaText" class="muted small"></div>
-    </div>
-    <button id="clearCache" class="secondary">Vider le cache</button>
-  </footer>
+    <section>
+      <form id="lookupForm" class="input-row">
+        <input id="ipInput" type="text" placeholder="Vérifier une IP (ex : 8.8.8.8)" autocomplete="off" spellcheck="false">
+        <button type="submit">Vérifier</button>
+      </form>
+      <div id="lookupResult"></div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <span>IP sur cette page</span>
+        <span id="fieldName" class="muted"></span>
+      </div>
+      <div id="summary" class="summary"></div>
+      <ul id="ipList" class="ip-list"></ul>
+      <div id="emptyMsg" class="muted center" hidden></div>
+    </section>
+  </main>
+
+  <main id="tab-settings" class="settings" role="tabpanel" hidden></main>
 
   <template id="ipCardTpl">
     <li class="ip-card">
@@ -56,6 +55,8 @@
 
   <script src="../shared/api.js"></script>
   <script src="../shared/ip.js"></script>
+  <script src="../shared/settings.js"></script>
+  <script src="../shared/settings-panel.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

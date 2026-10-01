@@ -5,6 +5,22 @@ Toutes les évolutions notables de ce projet sont documentées ici.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le
 projet respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 
+## [1.3.0] - 2026-10-01
+
+### Ajouté
+
+- Onglet **Paramètres** dans la popup : clé API (affichage masqué / visible),
+  champ Graylog, historique, cache.
+- Bouton **Tester la clé** avec affichage du quota restant.
+- Suivi de l'utilisation AbuseIPDB : requêtes du jour faites par l'extension,
+  quota restant du compte, historique des 7 derniers jours.
+- Nombre d'IP en cache et vidage du cache depuis les paramètres.
+
+### Modifié
+
+- La page d'options du navigateur utilise le même panneau que la popup.
+- La popup s'ouvre sur les paramètres tant qu'aucune clé API n'est configurée.
+
 ## [1.2.0] - 2026-10-01
 
 ### Ajouté
@@ -36,6 +52,7 @@ projet respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 - Info-bulle détaillée et lien vers AbuseIPDB.
 - Page de paramètres : clé API, champ, historique, durée du cache.
 
+[1.3.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.3.0
 [1.2.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.2.0
 [1.1.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.1.0
 [1.0.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.0.0

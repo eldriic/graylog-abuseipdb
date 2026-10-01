@@ -40,19 +40,23 @@ d'abus, sa ville et son pays — **sans toucher aux autres IP de la page**.
   la vue détaillée d'un message : score, ville, pays, mention `TOR`.
 - **Info-bulle détaillée** au survol : signalements, ISP, ASN, domaine, type
   d'usage, whitelist, date du dernier signalement, lien vers AbuseIPDB.
-- **Popup** dans la barre d'outils :
-  - liste des IP de la page triées par risque, avec détails dépliables ;
-  - recherche manuelle d'une IP ;
-  - suivi du quota AbuseIPDB journalier.
+- **Popup** dans la barre d'outils, en deux onglets :
+  - **Analyse** : IP de la page triées par risque avec détails dépliables,
+    recherche manuelle d'une IP ;
+  - **Paramètres** : clé API (avec test de validité), champ Graylog, cache, et
+    suivi de l'utilisation AbuseIPDB — requêtes du jour, quota restant du
+    compte, historique sur 7 jours.
 - **Champ configurable** : n'importe quel champ Graylog contenant une IP.
 - **Économe en quota** : cache local (24 h par défaut) et déduplication des
   requêtes ; les IP privées (RFC 1918, loopback, link-local, ULA) ne sont
   jamais envoyées.
 
 <p align="center">
-  <img src="docs/images/popup.png" alt="Popup : IP de la page" width="340">
-  &nbsp;&nbsp;
-  <img src="docs/images/popup-details.png" alt="Popup : détails d'une IP" width="340">
+  <img src="docs/images/popup.png" alt="Popup : IP de la page" width="270">
+  &nbsp;
+  <img src="docs/images/popup-details.png" alt="Popup : détails d'une IP" width="270">
+  &nbsp;
+  <img src="docs/images/settings.png" alt="Popup : paramètres et utilisation de l'API" width="270">
 </p>
 
 | Couleur   | Score     | Signification                    |
@@ -106,7 +110,8 @@ Pour un test rapide sans signature : `about:debugging#/runtime/this-firefox` →
 
 ## Configuration
 
-Ouvrez les paramètres de l'extension (⚙ dans la popup) :
+Cliquez sur l'icône de l'extension → onglet **Paramètres** (le même panneau est
+disponible dans les options du navigateur) :
 
 | Paramètre            | Défaut                | Description                                                            |
 | -------------------- | --------------------- | ---------------------------------------------------------------------- |
@@ -115,8 +120,17 @@ Ouvrez les paramètres de l'extension (⚙ dans la popup) :
 | `maxAgeInDays`       | `90`                  | Fenêtre d'historique des signalements AbuseIPDB                        |
 | Durée du cache       | `24` h                | `0` pour désactiver                                                    |
 
-Le plan gratuit AbuseIPDB autorise **1 000 requêtes par jour** ; le quota
-restant est affiché dans la popup.
+**Tester la clé** effectue une vraie requête (elle compte dans le quota) et
+affiche le quota restant.
+
+Le plan gratuit AbuseIPDB autorise **1 000 requêtes par jour**, réinitialisées
+à 00:00 UTC. L'onglet Paramètres distingue :
+
+- **les requêtes faites par l'extension** dans ce navigateur, comptées jour par
+  jour (seules les requêtes acceptées par AbuseIPDB sont comptées ; les
+  résultats servis depuis le cache ne consomment rien) ;
+- **le quota restant du compte**, lu dans les en-têtes de réponse d'AbuseIPDB —
+  il inclut donc l'usage de la même clé par d'autres outils.
 
 ## Utilisation
 
@@ -154,7 +168,7 @@ npm run start:chrome     # lance Chromium avec l'extension chargée
     ├── content/           # détection du champ Graylog et badges
     ├── popup/             # interface de la barre d'outils
     ├── options/           # page de paramètres
-    ├── shared/            # compatibilité browser/chrome, utilitaires IP
+    ├── shared/            # compatibilité browser/chrome, IP, paramètres, panneau partagé
     └── icons/
 ```
 
