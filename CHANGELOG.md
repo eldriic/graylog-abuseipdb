@@ -5,6 +5,18 @@ Toutes les évolutions notables de ce projet sont documentées ici.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le
 projet respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 
+## [1.4.0] - 2026-10-01
+
+### Ajouté
+
+- Bouton **Actualiser** (↻) dans la popup : relit la page Graylog et recharge
+  la liste des IP (les résultats en cache ne consomment pas de quota).
+
+### Modifié
+
+- Un changement du champ Graylog dans les paramètres s'applique sans recharger
+  la page.
+
 ## [1.3.0] - 2026-10-01
 
 ### Ajouté
@@ -52,6 +64,7 @@ projet respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 - Info-bulle détaillée et lien vers AbuseIPDB.
 - Page de paramètres : clé API, champ, historique, durée du cache.
 
+[1.4.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.4.0
 [1.3.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.3.0
 [1.2.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.2.0
 [1.1.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.1.0

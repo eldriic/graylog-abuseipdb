@@ -138,7 +138,8 @@ Le plan gratuit AbuseIPDB autorise **1 000 requêtes par jour**, réinitialisée
 2. Les badges apparaissent automatiquement, y compris après un rafraîchissement
    ou un changement de requête.
 3. Survolez un badge pour le détail, ou cliquez sur l'icône de l'extension pour
-   la vue d'ensemble.
+   la vue d'ensemble ; le bouton ↻ actualise la liste après un changement de
+   recherche.
 
 ## Développement
 

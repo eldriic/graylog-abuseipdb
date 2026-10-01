@@ -97,10 +97,12 @@ function renderSummary(results) {
 
 async function loadPageIps() {
   const empty = $("emptyMsg");
+  $("summary").replaceChildren();
+  $("ipList").replaceChildren();
   const [tab] = await ext.tabs.query({ active: true, currentWindow: true });
   let page;
   try {
-    page = await ext.tabs.sendMessage(tab.id, { type: "getPageIps" });
+    page = await ext.tabs.sendMessage(tab.id, { type: "getPageIps", rescan: true });
   } catch {
     empty.textContent = "Extension non active sur cet onglet.";
     empty.hidden = false;
@@ -159,6 +161,20 @@ $("noKeyLink").addEventListener("click", (e) => {
   showTab("settings");
 });
 
+async function refresh() {
+  const btn = $("refresh");
+  if (btn.disabled) return;
+  btn.disabled = true;
+  btn.classList.add("spinning");
+  try {
+    await loadPageIps();
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove("spinning");
+  }
+}
+$("refresh").addEventListener("click", refresh);
+
 SettingsPanel.mount($("tab-settings"));
 $("tab-settings").addEventListener("settings-saved", async () => {
   const { apiKey } = await Settings.load();
@@ -170,4 +186,4 @@ Settings.load().then(({ apiKey }) => {
   $("noKey").hidden = !!apiKey;
   showTab(apiKey ? "analysis" : "settings");
 });
-loadPageIps();
+refresh();

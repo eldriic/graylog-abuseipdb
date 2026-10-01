@@ -167,6 +167,7 @@
   // The popup asks which IPs of the field are currently shown on the page.
   ext.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     if (msg?.type !== "getPageIps") return false;
+    if (msg.rescan) scan();
     const ips = [...document.querySelectorAll(`[${DONE_ATTR}]`)].map((el) => el.getAttribute(DONE_ATTR));
     sendResponse({ field: fieldLabel, ips: [...new Set(ips)] });
     return false;
@@ -178,11 +179,20 @@
     timer = setTimeout(scan, 300);
   }).observe(document.body, { childList: true, subtree: true, characterData: true });
 
+  function setField(value) {
+    fieldLabel = value?.trim() || Settings.DEFAULTS.fieldName;
+    fieldName = fieldLabel.toLowerCase();
+  }
+
+  // Apply a field change from the settings without reloading the Graylog page.
+  ext.storage.onChanged.addListener((changes, area) => {
+    if (area !== "local" || !changes.fieldName) return;
+    setField(changes.fieldName.newValue);
+    scan();
+  });
+
   ext.storage.local.get("fieldName").then(({ fieldName: f }) => {
-    if (f) {
-      fieldLabel = f.trim();
-      fieldName = fieldLabel.toLowerCase();
-    }
+    setField(f);
     scan();
   });
 })();

@@ -58,6 +58,22 @@ button {
 button:hover { filter: brightness(1.1); }
 button.secondary { background: var(--panel); border: 1px solid var(--border); color: var(--text); }
 button.icon { flex: none; padding: 4px 8px; }
+.icon-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+}
+.icon-btn:hover { background: var(--border); color: var(--text); filter: none; }
+.icon-btn:disabled { cursor: default; }
+.spinning { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* Tabs */
 .tabs {

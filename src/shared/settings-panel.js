@@ -179,7 +179,7 @@ globalThis.SettingsPanel = (() => {
         cacheHours: Math.max(0, Number(ref.cacheHours.value) || 0),
       });
       await loadForm();
-      setStatus("✓ Enregistré. Rechargez la page Graylog pour appliquer le champ.");
+      setStatus("✓ Enregistré.");
       root.dispatchEvent(new CustomEvent("settings-saved", { bubbles: true }));
     });
 
