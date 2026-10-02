@@ -13,14 +13,21 @@
   },
   "permissions": [
     "storage",
+    "scripting",
+    "activeTab",
+    "contextMenus",
     "https://api.abuseipdb.com/*",
     "https://ipwho.is/*"
+  ],
+  "optional_permissions": [
+    "*://*/*"
   ],
   "background": {
     "scripts": [
       "shared/api.js",
       "shared/ip.js",
       "shared/settings.js",
+      "shared/sites.js",
       "background/background.js"
     ]
   },

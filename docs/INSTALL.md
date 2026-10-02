@@ -29,7 +29,7 @@ d'un build local.
 | -------------------- | ------------------------------------------------------------------------------------------- |
 | Navigateur           | Chrome / Edge / Brave / Opera / Vivaldi **116+**, ou Firefox **142+**                       |
 | Clé API AbuseIPDB    | Compte gratuit sur [abuseipdb.com](https://www.abuseipdb.com/register), puis [clé API](https://www.abuseipdb.com/account/api) |
-| Accès Graylog        | Une recherche dont les résultats contiennent un champ IP (par défaut `o365_audit_ClientIP`) |
+| Accès Graylog        | Une recherche dont les résultats contiennent une colonne d'IP (ex. `o365_audit_ClientIP`, `remip`) |
 | Node.js 20+          | Uniquement pour construire l'extension soi-même ou la signer pour Firefox                    |
 
 Pour connaître votre version : `chrome://version` (Chromium) ou menu
@@ -94,16 +94,8 @@ La carte **Graylog AbuseIPDB Lookup** apparaît dans la liste.
 Cliquez sur l'icône 🧩 (Extensions) de la barre d'outils, puis sur la punaise
 📌 à côté de **Graylog AbuseIPDB Lookup** pour garder l'icône visible.
 
-### 4. (Optionnel) Limiter l'extension à Graylog
-
-Par défaut, l'extension peut lire toutes les pages pour y chercher le champ
-Graylog configuré. Pour la restreindre à votre instance :
-
-1. `chrome://extensions` → **Détails** sur la carte de l'extension.
-2. **Accès aux sites** → **Sur des sites spécifiques**.
-3. Ajoutez l'URL de votre Graylog, par exemple `https://graylog.exemple.local/*`.
-
-Les appels vers AbuseIPDB et ipwho.is ne sont pas affectés.
+L'extension n'a accès à aucune page tant que vous n'avez pas autorisé votre
+instance Graylog : voir [Première configuration](#première-configuration).
 
 ## Firefox
 
@@ -161,7 +153,9 @@ La signature est gratuite et se fait en mode *unlisted* : l'extension n'est
    - ou `about:addons` → ⚙️ → **Installer un module depuis un fichier…**.
 
 6. Firefox affiche les permissions demandées et la **collecte de données**
-   (contenu des sites web : les IP du champ configuré) → **Ajouter**.
+   (contenu des sites web : les IP des champs analysés) → **Ajouter**.
+   L'accès à votre Graylog est demandé plus tard, lors de la
+   [première configuration](#première-configuration).
 
 7. Épinglez l'icône : bouton 🧩 de la barre d'outils → ⚙️ à côté de
    l'extension → **Épingler à la barre d'outils**.
@@ -196,23 +190,35 @@ vérification de signature :
 
 ## Première configuration
 
-1. Cliquez sur l'icône de l'extension → onglet **Paramètres**
-   (également accessible depuis les options de l'extension).
-2. Collez votre **clé API AbuseIPDB**.
+1. **Autorisez votre Graylog** : ouvrez-le dans un onglet, cliquez sur l'icône
+   de l'extension → **Activer sur ce site**, puis acceptez la demande du
+   navigateur. Autre possibilité : onglet **Paramètres** → **Sites Graylog** →
+   saisissez l'adresse (ex. `https://graylog.exemple.fr`) → **Ajouter**.
+2. Onglet **Paramètres** (également accessible depuis les options de
+   l'extension) : collez votre **clé API AbuseIPDB**. Les réglages sont
+   enregistrés automatiquement, sans bouton à cliquer.
 3. Cliquez sur **Tester la clé** : le quota restant s'affiche si la clé est
    valide (ce test consomme une requête).
-4. Vérifiez le **nom du champ Graylog** : il doit correspondre exactement au
-   nom de la colonne affichée dans Graylog (la casse est ignorée). Par défaut :
-   `o365_audit_ClientIP`.
-5. Enregistrez.
+4. Choisissez les colonnes analysées (carte **Détection**) :
+   - par défaut, la **détection automatique** enrichit toutes les colonnes ne
+     contenant que des IP (`o365_audit_ClientIP`, `remip`, `src_ip`…) ;
+     listez dans **Champs exclus** celles à ignorer (ex. `source`) ;
+   - pour n'analyser que certains champs, désactivez la détection et listez-les
+     dans **Champs à analyser** (ex. `o365_audit_ClientIP, remip`) ;
+   - pour enrichir aussi les IP au milieu d'un texte (`message`, `logdesc`…),
+     activez **Toutes les IP** (désactivé par défaut, consomme beaucoup de
+     quota).
 
-Les autres réglages (`maxAgeInDays`, durée du cache) sont décrits dans le
-[README](../README.md#configuration).
+   Les noms doivent correspondre aux colonnes affichées dans Graylog (casse
+   ignorée), séparés par des virgules.
+
+Les autres réglages (`maxAgeInDays`, cache, seuil d'alerte, réserve de quota)
+sont décrits dans le [README](../README.md#paramètres).
 
 ## Vérifier que tout fonctionne
 
 1. Ouvrez Graylog et lancez une recherche dont les résultats affichent le
-   champ configuré (tableau de messages, widget d'agrégation ou détail d'un
+   colonne d'IP (tableau de messages, widget d'agrégation ou détail d'un
    message).
 2. Un badge coloré (score, ville, pays) doit apparaître à côté de chaque IP
    publique de ce champ ; les IP privées s'affichent en gris.
@@ -222,7 +228,12 @@ Les autres réglages (`maxAgeInDays`, durée du cache) sont décrits dans le
 
 ## Mettre à jour
 
-Les réglages (clé API, champ, cache) sont conservés lors d'une mise à jour.
+Les réglages (clé API, champs, cache) sont conservés lors d'une mise à jour.
+
+> [!NOTE]
+> Depuis la version 1.5.0, l'extension ne lit plus toutes les pages : après
+> une mise à jour depuis une version 1.4.x, autorisez votre Graylog une fois
+> (icône de l'extension → **Activer sur ce site**).
 
 **Chrome et dérivés**
 
@@ -265,9 +276,11 @@ La clé API et le cache sont effacés avec l'extension.
 | `npm run sign:firefox` : *Duplicate add-on ID found* / *add-on ID already in use* | L'identifiant `graylog-abuseipdb@local` est déjà associé à un autre compte Mozilla | Remplacez `gecko.id` dans `manifests/firefox.json` par un identifiant unique (ex. `graylog-abuseipdb@votre-domaine`) puis relancez |
 | `npm run sign:firefox` : *Version already exists* | Version déjà signée | Augmentez `version` dans `package.json` |
 | `npm run sign:firefox` : *401 / Unauthorized* | Identifiants API incorrects ou variables non exportées | Vérifiez `WEB_EXT_API_KEY` / `WEB_EXT_API_SECRET` dans le terminal courant |
-| Aucun badge dans Graylog | Nom de champ différent, ou page ouverte avant l'installation | Vérifiez le nom du champ dans **Paramètres**, puis rechargez l'onglet Graylog |
-| Aucun badge dans Graylog (Chrome) | Accès aux sites restreint sans inclure Graylog | **Détails** → **Accès aux sites** : ajoutez l'URL de Graylog |
-| Badges gris uniquement | IP privées (RFC 1918, loopback…) | Comportement normal : elles ne sont jamais envoyées à AbuseIPDB |
+| Aucun badge dans Graylog, la popup propose **Activer sur ce site** | Site Graylog non autorisé | Cliquez sur **Activer sur ce site** et acceptez la demande du navigateur |
+| Aucun badge dans Graylog, site autorisé | Détection désactivée et nom de champ différent, ou colonne exclue | Vérifiez la carte **Détection** des **Paramètres** ; la popup indique le mode et les champs |
+| Popup : *Rechargez la page pour lancer l'analyse* | Onglet ouvert pendant une mise à jour de l'extension | Rechargez l'onglet Graylog |
+| Badges gris `privée` | IP privées ou réservées (RFC 1918, CGNAT, loopback…) | Comportement normal : elles ne sont jamais envoyées à AbuseIPDB |
+| Badges gris `quota` | Réserve de quota atteinte | Attendez la réinitialisation (00:00 UTC), baissez la **réserve de quota** puis cliquez sur le bouton vert d'actualisation de la popup, ou utilisez la recherche manuelle |
 | Badges « erreur » | Requête refusée — survolez le badge pour lire le message exact | Voir les lignes suivantes |
 | Survol : *Clé API AbuseIPDB manquante* | Aucune clé enregistrée | Saisissez la clé dans **Paramètres** |
 | Survol : *AbuseIPDB: … authentication …* ou *HTTP 401* | Clé API invalide | Ressaisissez la clé et cliquez sur **Tester la clé** |

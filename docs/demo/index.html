@@ -28,10 +28,17 @@
     be tested without a Graylog server.</em><br><br>
     1. Saisissez une clé API AbuseIPDB dans l'onglet <strong>Paramètres</strong>
     de l'extension (compte gratuit : <a href="https://www.abuseipdb.com/register">abuseipdb.com</a>).<br>
-    2. Laissez le champ par défaut <code>o365_audit_ClientIP</code>, puis
-    rechargez cette page.<br>
-    3. Seules les IP de la colonne <code>o365_audit_ClientIP</code> reçoivent
-    un badge ; celles de la colonne <code>source</code> sont ignorées.
+    2. Cliquez sur l'icône de l'extension → <strong>Activer sur ce site</strong>
+    et acceptez la demande du navigateur.<br>
+    3. La colonne <code>o365_audit_ClientIP</code> et les colonnes ne contenant
+    que des IP (<code>source</code>, <code>remip</code>) reçoivent un badge ; la
+    colonne <code>logdesc</code>, dont le texte contient une IP, est ignorée.<br>
+    4. Paramètres → <strong>Champs exclus</strong> : <code>source</code> retire
+    cette colonne. En désactivant la <strong>détection automatique</strong>,
+    seuls les <strong>champs à analyser</strong> listés (par défaut
+    <code>o365_audit_ClientIP</code>) reçoivent un badge.<br>
+    5. Avec <strong>Toutes les IP</strong>, les IP au milieu d'un texte
+    (<code>logdesc</code>) reçoivent aussi un badge, une par adresse.
   </p>
 
   <h2>Widget d'agrégation / Aggregation widget</h2>
@@ -59,11 +66,24 @@
     </tbody>
   </table>
 
+  <h2>Agrégation pare-feu / Firewall aggregation</h2>
+  <table>
+    <thead>
+      <tr><th>event_src</th><th>user</th><th>remip</th><th>logdesc</th><th>remip_country_code</th><th>count()</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>fw-demo-01</td><td>alice@example.com</td><td>1.0.0.1</td><td>Ssl vpn statistics</td><td>AU</td><td>1</td></tr>
+      <tr><td></td><td></td><td></td><td>Ssl vpn tunnel down from 8.8.4.4</td><td>US</td><td>2</td></tr>
+      <tr><td></td><td></td><td>149.112.112.112</td><td>Ssl vpn tunnel up, peer 9.9.9.9 gw 10.0.0.1</td><td>US</td><td>2</td></tr>
+    </tbody>
+  </table>
+
   <h2>Détail d'un message / Message details</h2>
   <dl>
     <dt>timestamp</dt><dd>2026-10-02 08:14:03</dd>
     <dt>source</dt><dd>9.9.9.9</dd>
     <dt>o365_audit_ClientIP</dt><dd>9.9.9.9</dd>
+    <dt>gl2_remote_ip</dt><dd>4.2.2.2</dd>
     <dt>message</dt><dd>UserLoggedIn</dd>
   </dl>
 </body>

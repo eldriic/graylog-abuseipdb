@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Syntax-checks every JavaScript file under src/ and scripts/ (no dependencies).
+ * Syntax-checks every JavaScript file under src/, scripts/ and test/ (no dependencies).
  */
 import { execFileSync } from "node:child_process";
 import { readdirSync } from "node:fs";
@@ -18,7 +18,7 @@ function* jsFiles(dir) {
 }
 
 let failed = 0;
-for (const dir of ["src", "scripts"]) {
+for (const dir of ["src", "scripts", "test"]) {
   for (const file of jsFiles(join(ROOT, dir))) {
     try {
       execFileSync(process.execPath, ["--check", file], { stdio: "pipe" });

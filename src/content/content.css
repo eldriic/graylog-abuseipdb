@@ -17,8 +17,16 @@
 .abipdb-medium  { background: #ef6c00; }
 .abipdb-high    { background: #c62828; }
 .abipdb-loading,
-.abipdb-private { background: #555; }
+.abipdb-private,
+.abipdb-paused  { background: #555; }
 .abipdb-error   { background: #6a1b9a; }
+
+/* Table row whose score reaches the alert threshold. An inset shadow tints
+   the cells without overriding Graylog's own backgrounds. */
+tr.abipdb-alert-row > td { box-shadow: inset 0 0 0 9999px rgba(198, 40, 40, 0.16); }
+tr.abipdb-alert-row > td:first-child {
+  box-shadow: inset 3px 0 0 #c62828, inset 0 0 0 9999px rgba(198, 40, 40, 0.16);
+}
 
 .abipdb-tooltip {
   display: none;

@@ -1,9 +1,34 @@
 /**
- * Settings panel: AbuseIPDB usage (today, account quota, 7-day history) and
- * configuration form. Mounted by the popup "Paramètres" tab and the options page.
+ * Settings panel: AbuseIPDB usage (today, account quota, 7-day history),
+ * API key, authorized Graylog sites and preferences. Every preference is saved
+ * as soon as it changes. Mounted by the popup "Paramètres" tab and the options
+ * page.
  */
 globalThis.SettingsPanel = (() => {
   const HISTORY_DAYS = 7;
+  const SAVED_TOAST_MS = 1600;
+
+  // Lucide icons (ISC license), static markup.
+  const ICONS = {
+    eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    eyeOff:
+      '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.4 10.4 0 0 1 12 5c6.5 0 10 7 10 7a13.2 13.2 0 0 1-1.67 2.68"/>' +
+      '<path d="M6.61 6.61A13.5 13.5 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.39-1.61"/><path d="m2 2 20 20"/>',
+    x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  };
+
+  function icon(name, className = "") {
+    return (
+      `<svg class="icon ${className}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" ` +
+      `stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">` +
+      `${ICONS[name]}</svg>`
+    );
+  }
+
+  /** An icon as a DOM node, for elements built at runtime. */
+  function iconNode(name) {
+    return new DOMParser().parseFromString(icon(name), "image/svg+xml").documentElement;
+  }
 
   // Static markup only: every dynamic value is set through textContent / value.
   const TEMPLATE = `
@@ -26,45 +51,126 @@ globalThis.SettingsPanel = (() => {
       <div class="muted small" data-ref="resetInfo"></div>
     </div>
 
-    <form class="group" data-ref="form" autocomplete="off">
-      <div class="group-title">Configuration</div>
+    <div class="prefs">
+      <section>
+        <div class="pref-head">
+          <h2 class="group-title">Clé API AbuseIPDB</h2>
+          <span class="pill" data-ref="keyState"></span>
+        </div>
+        <div class="card card-body">
+          <div class="input-group">
+            <input data-ref="apiKey" type="password" spellcheck="false" autocomplete="off" placeholder="Collez votre clé ici" aria-label="Clé API AbuseIPDB">
+            <button type="button" class="ghost-btn" data-ref="toggleKey" aria-pressed="false" title="Afficher / masquer la clé">${icon("eye", "icon-show")}${icon("eyeOff", "icon-hide")}</button>
+          </div>
+          <div class="card-foot">
+            <a href="https://www.abuseipdb.com/account/api" target="_blank" rel="noopener noreferrer">Créer ou retrouver une clé ↗</a>
+            <button type="button" class="secondary small-btn" data-ref="testKey" title="Effectue une vraie requête (compte dans le quota)">Tester la clé</button>
+          </div>
+          <div class="status small" data-ref="keyStatus" role="status"></div>
+        </div>
+      </section>
 
-      <label class="field">
-        <span>Clé API AbuseIPDB</span>
-        <span class="input-row">
-          <input data-ref="apiKey" type="password" spellcheck="false" placeholder="Collez votre clé ici">
-          <button type="button" class="secondary icon" data-ref="toggleKey" title="Afficher / masquer">👁</button>
-        </span>
-        <a class="small" href="https://www.abuseipdb.com/account/api" target="_blank" rel="noopener noreferrer">Créer ou retrouver une clé ↗</a>
-      </label>
+      <section>
+        <div class="pref-head">
+          <h2 class="group-title">Sites Graylog</h2>
+        </div>
+        <div class="card">
+          <ul class="site-list" data-ref="sites"></ul>
+          <div class="card-empty" data-ref="noSites" hidden>
+            Aucun site autorisé : l'extension ne lit aucune page. Ajoutez l'adresse de
+            votre Graylog, ou cliquez sur « Activer sur ce site » dans l'onglet Analyse.
+          </div>
+          <div class="card-body">
+            <form class="input-group" data-ref="siteForm" autocomplete="off">
+              <input data-ref="siteInput" type="text" spellcheck="false" placeholder="https://graylog.exemple.fr" aria-label="Adresse du site Graylog">
+              <button type="submit">Ajouter</button>
+            </form>
+            <div class="status small" data-ref="siteStatus" role="status"></div>
+          </div>
+        </div>
+      </section>
 
-      <label class="field">
-        <span>Champ Graylog à analyser</span>
-        <input data-ref="fieldName" type="text" spellcheck="false">
-      </label>
+      <section>
+        <div class="pref-head">
+          <h2 class="group-title">Détection</h2>
+        </div>
+        <div class="card">
+          <label class="pref" data-ref="autoDetectRow">
+            <span class="pref-text">
+              <span class="pref-label">Détection automatique</span>
+              <span class="pref-desc">Analyse toutes les colonnes ne contenant que des adresses IP (remip, src_ip…).</span>
+            </span>
+            <span class="switch"><input data-ref="autoDetect" type="checkbox" role="switch"><span class="track"></span></span>
+          </label>
+          <label class="pref">
+            <span class="pref-text">
+              <span class="pref-label">Toutes les IP</span>
+              <span class="pref-desc">Analyse chaque IP des résultats, y compris au milieu d'un texte (message, logdesc…). Consomme beaucoup de quota.</span>
+            </span>
+            <span class="switch"><input data-ref="allIps" type="checkbox" role="switch"><span class="track"></span></span>
+          </label>
+          <label class="pref pref-stack" data-ref="excludedRow">
+            <span class="pref-text">
+              <span class="pref-label">Champs exclus</span>
+              <span class="pref-desc">Jamais analysés, séparés par des virgules. Facultatif.</span>
+            </span>
+            <input data-ref="excludedFields" type="text" spellcheck="false" autocomplete="off" placeholder="ex. source, dstip">
+          </label>
+          <label class="pref pref-stack" data-ref="fieldsRow">
+            <span class="pref-text">
+              <span class="pref-label">Champs à analyser</span>
+              <span class="pref-desc">Seules ces colonnes sont analysées, séparées par des virgules.</span>
+            </span>
+            <input data-ref="fieldName" type="text" spellcheck="false" autocomplete="off" placeholder="ex. o365_audit_ClientIP, remip">
+          </label>
+          <label class="pref">
+            <span class="pref-text">
+              <span class="pref-label">Seuil d'alerte</span>
+              <span class="pref-desc">Lignes surlignées et compteur sur l'icône à partir de ce score. 0 pour désactiver.</span>
+            </span>
+            <span class="num"><input data-ref="alertThreshold" type="number" min="0" max="100"><span class="unit">%</span></span>
+          </label>
+        </div>
+      </section>
 
-      <div class="field-row">
-        <label class="field">
-          <span>Historique (jours)</span>
-          <input data-ref="maxAgeDays" type="number" min="1" max="365">
-        </label>
-        <label class="field">
-          <span>Cache (heures)</span>
-          <input data-ref="cacheHours" type="number" min="0">
-        </label>
-      </div>
-
-      <div class="actions">
-        <button type="submit">Enregistrer</button>
-        <button type="button" class="secondary" data-ref="testKey" title="Effectue une vraie requête (compte dans le quota)">Tester la clé</button>
-      </div>
-      <div class="status small" data-ref="status" role="status"></div>
-    </form>
-
-    <div class="group cache-row">
-      <span class="muted" data-ref="cacheInfo"></span>
-      <button type="button" class="secondary" data-ref="clearCache">Vider le cache</button>
+      <section>
+        <div class="pref-head">
+          <h2 class="group-title">Quota et cache</h2>
+        </div>
+        <div class="card">
+          <label class="pref">
+            <span class="pref-text">
+              <span class="pref-label">Réserve de quota</span>
+              <span class="pref-desc">Requêtes gardées pour la recherche manuelle : en dessous, les badges automatiques s'arrêtent.</span>
+            </span>
+            <span class="num"><input data-ref="quotaReserve" type="number" min="0"><span class="unit">req.</span></span>
+          </label>
+          <label class="pref">
+            <span class="pref-text">
+              <span class="pref-label">Durée du cache</span>
+              <span class="pref-desc">Une IP en cache ne consomme pas de requête. 0 pour désactiver.</span>
+            </span>
+            <span class="num"><input data-ref="cacheHours" type="number" min="0"><span class="unit">h</span></span>
+          </label>
+          <label class="pref">
+            <span class="pref-text">
+              <span class="pref-label">Historique des signalements</span>
+              <span class="pref-desc">Période prise en compte par AbuseIPDB pour le score.</span>
+            </span>
+            <span class="num"><input data-ref="maxAgeDays" type="number" min="1" max="365"><span class="unit">j</span></span>
+          </label>
+          <div class="pref">
+            <span class="pref-text">
+              <span class="pref-label">Cache local</span>
+              <span class="pref-desc" data-ref="cacheInfo"></span>
+            </span>
+            <button type="button" class="secondary small-btn" data-ref="clearCache">Vider</button>
+          </div>
+        </div>
+      </section>
     </div>
+
+    <div class="toast" data-ref="saved" role="status" aria-live="polite">✓ Enregistré</div>
   `;
 
   function mount(root) {
@@ -72,33 +178,77 @@ globalThis.SettingsPanel = (() => {
     root.replaceChildren(...doc.body.childNodes);
     const ref = Object.fromEntries([...root.querySelectorAll("[data-ref]")].map((el) => [el.dataset.ref, el]));
 
-    function setStatus(text, kind = "ok") {
-      ref.status.textContent = text;
-      ref.status.dataset.kind = kind;
+    function setStatus(el, text, kind = "ok") {
+      el.textContent = text;
+      el.dataset.kind = kind;
     }
 
-    async function loadForm() {
-      const s = await Settings.load();
-      for (const k of Object.keys(Settings.DEFAULTS)) ref[k].value = s[k];
+    const isSwitch = (el) => el.type === "checkbox";
+
+    function writeForm(values) {
+      for (const k of Object.keys(Settings.DEFAULTS)) {
+        if (isSwitch(ref[k])) ref[k].checked = values[k];
+        else ref[k].value = values[k];
+      }
+      renderKeyState(values.apiKey);
+      renderDetectionMode();
+    }
+
+    // Detection modes use the exclusion list; otherwise only the listed fields count.
+    // "All IPs" includes automatic detection, whose switch then has no effect.
+    function renderDetectionMode() {
+      const allIps = ref.allIps.checked;
+      const anyField = allIps || ref.autoDetect.checked;
+      ref.autoDetect.disabled = allIps;
+      ref.autoDetectRow.classList.toggle("is-disabled", allIps);
+      ref.excludedRow.hidden = !anyField;
+      ref.fieldsRow.hidden = anyField;
+    }
+
+    function readForm() {
+      return Object.fromEntries(
+        Object.keys(Settings.DEFAULTS).map((k) => [k, isSwitch(ref[k]) ? ref[k].checked : ref[k].value]),
+      );
+    }
+
+    function renderKeyState(apiKey, tested) {
+      const [text, kind] = tested ?? (apiKey ? ["Enregistrée", "neutral"] : ["Manquante", "warn"]);
+      ref.keyState.textContent = text;
+      ref.keyState.dataset.kind = kind;
+    }
+
+    let toastTimer = null;
+
+    function showSaved() {
+      ref.saved.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => ref.saved.classList.remove("show"), SAVED_TOAST_MS);
+    }
+
+    async function save() {
+      const values = Settings.sanitize(readForm());
+      await Settings.save(values);
+      writeForm(values); // show the clamped / normalized values
+      showSaved();
+      root.dispatchEvent(new CustomEvent("settings-saved", { bubbles: true }));
     }
 
     async function renderUsage() {
       const { usage = {}, quota } = await ext.storage.local.get(["usage", "quota"]);
       ref.today.textContent = usage[Settings.dayKey()] || 0;
 
-      if (quota) {
-        // The quota header is a snapshot: after the UTC reset it no longer applies.
-        const stale = Settings.dayKey(new Date(quota.ts)) !== Settings.dayKey();
-        const remaining = stale ? quota.limit : quota.remaining;
+      const live = Settings.liveQuota(quota);
+      if (live) {
+        const { remaining, limit } = live;
         ref.remaining.textContent = remaining.toLocaleString();
-        ref.remainingLabel.textContent = `restantes sur ${quota.limit.toLocaleString()} (compte)`;
-        const pct = quota.limit ? (remaining / quota.limit) * 100 : 0;
+        ref.remainingLabel.textContent = `restantes sur ${limit.toLocaleString()} (compte)`;
+        const pct = limit ? (remaining / limit) * 100 : 0;
         ref.quotaFill.style.width = `${pct}%`;
         ref.quotaFill.dataset.level = pct < 10 ? "high" : pct < 30 ? "medium" : "clean";
       }
 
-      const reset = Settings.nextReset().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-      ref.resetInfo.textContent = `Le quota se réinitialise chaque jour à 00:00 UTC (${reset} heure locale).`;
+      ref.resetInfo.textContent =
+        `Le quota se réinitialise chaque jour à 00:00 UTC (${Settings.nextResetTime()} heure locale).`;
 
       renderChart(usage);
     }
@@ -163,36 +313,74 @@ globalThis.SettingsPanel = (() => {
     async function renderCacheInfo() {
       const all = await ext.storage.local.get(null);
       const n = Object.keys(all).filter((k) => k.startsWith("cache:")).length;
-      ref.cacheInfo.textContent = `${n} IP en cache`;
+      ref.cacheInfo.textContent = n ? `${n.toLocaleString()} IP enregistrée${n > 1 ? "s" : ""}.` : "Vide.";
     }
 
-    ref.toggleKey.addEventListener("click", () => {
-      ref.apiKey.type = ref.apiKey.type === "password" ? "text" : "password";
+    async function renderSites() {
+      const sites = await Sites.list();
+      ref.noSites.hidden = sites.length > 0;
+      ref.sites.replaceChildren(
+        ...sites.map((pattern) => {
+          const li = document.createElement("li");
+          const dot = document.createElement("span");
+          dot.className = "site-dot";
+          const label = document.createElement("span");
+          label.className = "site";
+          label.textContent = Sites.label(pattern);
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "icon-only";
+          remove.title = `Retirer ${Sites.label(pattern)}`;
+          remove.setAttribute("aria-label", remove.title);
+          remove.appendChild(iconNode("x"));
+          remove.addEventListener("click", () => ext.permissions.remove({ origins: [pattern] }));
+          li.append(dot, label, remove);
+          return li;
+        }),
+      );
+    }
+
+    ref.siteForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const pattern = Sites.patternFor(ref.siteInput.value);
+      if (!pattern) {
+        return setStatus(ref.siteStatus, "Adresse invalide (ex : https://graylog.exemple.fr).", "error");
+      }
+      // Nothing may be awaited before request(): Firefox requires it to run within the click.
+      ext.permissions.request({ origins: [pattern] }).then(
+        (granted) => {
+          if (!granted) return setStatus(ref.siteStatus, "Autorisation refusée.", "error");
+          ref.siteInput.value = "";
+          setStatus(ref.siteStatus, `✓ ${Sites.label(pattern)} autorisé. Les onglets ouverts sont analysés.`);
+        },
+        (err) => setStatus(ref.siteStatus, `✗ ${err.message}`, "error"),
+      );
     });
 
-    ref.form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      await Settings.save({
-        apiKey: ref.apiKey.value.trim(),
-        fieldName: ref.fieldName.value.trim() || Settings.DEFAULTS.fieldName,
-        maxAgeDays: Math.min(365, Math.max(1, Number(ref.maxAgeDays.value) || Settings.DEFAULTS.maxAgeDays)),
-        cacheHours: Math.max(0, Number(ref.cacheHours.value) || 0),
-      });
-      await loadForm();
-      setStatus("✓ Enregistré.");
-      root.dispatchEvent(new CustomEvent("settings-saved", { bubbles: true }));
+    ref.toggleKey.addEventListener("click", () => {
+      const show = ref.apiKey.type === "password";
+      ref.apiKey.type = show ? "text" : "password";
+      ref.toggleKey.setAttribute("aria-pressed", String(show));
     });
+
+    // Autosave: "change" fires once the value is committed (blur, Enter, toggle, spinner).
+    for (const k of Object.keys(Settings.DEFAULTS)) ref[k].addEventListener("change", save);
+    ref.autoDetect.addEventListener("change", renderDetectionMode);
+    ref.allIps.addEventListener("change", renderDetectionMode);
 
     ref.testKey.addEventListener("click", async () => {
       const apiKey = ref.apiKey.value.trim();
-      if (!apiKey) return setStatus("Saisissez une clé avant de la tester.", "error");
-      setStatus("Test en cours…", "pending");
+      if (!apiKey) return setStatus(ref.keyStatus, "Collez une clé avant de la tester.", "error");
+      setStatus(ref.keyStatus, "Test en cours…", "pending");
       const res = await ext.runtime.sendMessage({ type: "testKey", apiKey });
       if (res.ok) {
-        const left = res.quota ? ` — ${res.quota.remaining} / ${res.quota.limit} requêtes restantes` : "";
-        setStatus(`✓ Clé valide${left}. Pensez à enregistrer.`);
+        const q = res.quota;
+        const left = q ? ` ${q.remaining.toLocaleString()} / ${q.limit.toLocaleString()} requêtes restantes.` : "";
+        setStatus(ref.keyStatus, `✓ Clé valide.${left}`);
+        renderKeyState(apiKey, ["Valide", "ok"]);
       } else {
-        setStatus(`✗ ${res.error}`, "error");
+        setStatus(ref.keyStatus, `✗ ${res.error}`, "error");
+        renderKeyState(apiKey, ["Invalide", "error"]);
       }
       renderUsage();
     });
@@ -208,8 +396,11 @@ globalThis.SettingsPanel = (() => {
       if (changes.usage || changes.quota) renderUsage();
       if (Object.keys(changes).some((k) => k.startsWith("cache:"))) renderCacheInfo();
     });
+    ext.permissions.onAdded.addListener(renderSites);
+    ext.permissions.onRemoved.addListener(renderSites);
 
-    loadForm();
+    Settings.load().then(writeForm);
+    renderSites();
     renderUsage();
     renderCacheInfo();
   }

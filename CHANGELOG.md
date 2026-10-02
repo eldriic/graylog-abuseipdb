@@ -5,6 +5,55 @@ Toutes les évolutions notables de ce projet sont documentées ici.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le
 projet respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 
+## [1.5.0] - 2026-10-02
+
+### Ajouté
+
+- Compteur sur l'icône de l'extension : nombre d'IP de l'onglet dont le score
+  atteint le **seuil d'alerte** (75 % par défaut, réglable).
+- Surlignage des lignes Graylog dont le score atteint le seuil d'alerte.
+- Menu contextuel **Vérifier « … » sur AbuseIPDB** sur une sélection de texte.
+- Copie des IP et export CSV depuis la popup.
+- **Détection automatique** des colonnes d'IP, activée par défaut : toute
+  colonne ou tout champ dont les valeurs sont uniquement des IP
+  (`o365_audit_ClientIP`, `remip`, `src_ip`…) reçoit des badges ; **champs
+  exclus** configurables, métadonnées `gl2_*` toujours exclues.
+- Détection désactivée : un ou plusieurs **champs à analyser** au choix
+  (séparés par des virgules).
+- Option **Toutes les IP** (désactivée par défaut) : badge sur chaque IP des
+  résultats, y compris au milieu d'un texte, un badge par adresse.
+- **Réserve de quota** : les recherches automatiques s'arrêtent quand il reste
+  ce nombre de requêtes (50 par défaut), la recherche manuelle reste possible.
+- Tests unitaires (`npm test`), exécutés par la CI.
+
+### Modifié
+
+- Paramètres repensés : sections en cartes (clé API, sites, détection, quota et
+  cache), interrupteurs, unités affichées, enregistrement automatique à
+  chaque modification (le bouton **Enregistrer** disparaît).
+- Bouton d'actualisation de la popup redessiné (icône verte).
+- **L'extension ne lit plus toutes les pages** : chaque instance Graylog est
+  autorisée explicitement (bouton **Activer sur ce site** de la popup ou
+  liste **Sites Graylog** des paramètres). Après la mise à jour, autorisez
+  votre Graylog une fois.
+- Au plus 4 requêtes AbuseIPDB simultanées ; plus aucune requête quand le
+  quota du jour est épuisé.
+- Les entrées expirées du cache sont purgées automatiquement.
+- L'info-bulle s'affiche au-dessus du badge près du bas de la fenêtre.
+- La recherche manuelle accepte un texte contenant une IP et refuse les
+  saisies invalides sans consommer de requête.
+
+### Corrigé
+
+- Plages d'adresses réservées envoyées à tort aux API : CGNAT
+  (`100.64.0.0/10`), multicast, broadcast, plages de documentation et de
+  test, IPv6 multicast et IPv4-mappées (`::ffff:10.0.0.1`).
+- Les adresses aux octets invalides (`999.1.1.1`) ne sont plus détectées.
+- Un résultat arrivé après le réaffichage d'une cellule par Graylog ne
+  s'applique plus à la mauvaise IP.
+- Une ligne de message dépliée (cellule couvrant toutes les colonnes) n'est
+  plus prise pour une valeur de champ.
+
 ## [1.4.1] - 2026-10-02
 
 ### Ajouté
@@ -79,6 +128,7 @@ projet respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 - Info-bulle détaillée et lien vers AbuseIPDB.
 - Page de paramètres : clé API, champ, historique, durée du cache.
 
+[1.5.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.5.0
 [1.4.1]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.4.1
 [1.4.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.4.0
 [1.3.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.3.0

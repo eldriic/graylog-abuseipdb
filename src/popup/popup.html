@@ -8,7 +8,12 @@
   <header>
     <img src="../icons/icon.svg" alt="" width="22" height="22">
     <h1>AbuseIPDB Lookup</h1>
-    <button type="button" id="refresh" class="icon-btn" title="Actualiser" aria-label="Actualiser">↻</button>
+    <button type="button" id="refresh" class="icon-btn" title="Actualiser les IP de la page" aria-label="Actualiser les IP de la page">
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+        <path d="M21 3v6h-6"/>
+      </svg>
+    </button>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -19,6 +24,10 @@
   <main id="tab-analysis" role="tabpanel" hidden>
     <div id="noKey" class="banner" hidden>
       Aucune clé API configurée. <a href="#" id="noKeyLink">Ouvrir les paramètres</a>
+    </div>
+    <div id="siteBanner" class="banner site-banner" hidden>
+      <span>L'analyse n'est pas activée sur <strong id="siteHost"></strong>.</span>
+      <button type="button" id="enableSite">Activer sur ce site</button>
     </div>
 
     <section>
@@ -34,7 +43,11 @@
         <span>IP sur cette page</span>
         <span id="fieldName" class="muted"></span>
       </div>
-      <div id="summary" class="summary"></div>
+      <div class="list-actions">
+        <div id="summary" class="summary"></div>
+        <button type="button" id="copyIps" class="secondary small-btn" title="Copier les IP publiques, une par ligne" disabled>Copier</button>
+        <button type="button" id="exportCsv" class="secondary small-btn" title="Télécharger les résultats au format CSV" disabled>CSV</button>
+      </div>
       <ul id="ipList" class="ip-list"></ul>
       <div id="emptyMsg" class="muted center" hidden></div>
     </section>
@@ -57,7 +70,9 @@
   <script src="../shared/api.js"></script>
   <script src="../shared/ip.js"></script>
   <script src="../shared/settings.js"></script>
+  <script src="../shared/sites.js"></script>
   <script src="../shared/settings-panel.js"></script>
+  <script src="export.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

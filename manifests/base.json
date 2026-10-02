@@ -1,6 +1,6 @@
 {
   "name": "Graylog AbuseIPDB Lookup",
-  "description": "Affiche le score AbuseIPDB et la géolocalisation des IP d'un champ Graylog précis (par défaut o365_audit_ClientIP).",
+  "description": "Score AbuseIPDB et géolocalisation des IP de vos colonnes Graylog (détection automatique ou champs choisis).",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -8,23 +8,6 @@
     "96": "icons/icon-96.png",
     "128": "icons/icon-128.png"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "shared/api.js",
-        "shared/ip.js",
-        "shared/settings.js",
-        "content/content.js"
-      ],
-      "css": [
-        "content/content.css"
-      ],
-      "run_at": "document_idle"
-    }
-  ],
   "options_ui": {
     "page": "options/options.html",
     "open_in_tab": false
