@@ -196,6 +196,7 @@ fois, dans `package.json`, et injectée dans chaque manifest au build.
   [ipwho.is](https://ipwho.is) (ville / région).
 - La clé API et le cache restent dans le stockage local du navigateur ; aucune
   autre donnée de la page ne quitte la machine.
+- Détails : [politique de confidentialité](PRIVACY.md).
 - Les captures d'écran de ce dépôt utilisent des adresses de documentation
   (RFC 5737 / RFC 3849) et des données fictives.
 

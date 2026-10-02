@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Graylog AbuseIPDB Lookup — page de démonstration</title>
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 2rem auto; max-width: 900px; padding: 0 1rem; color: #1f2328; }
+    h1 { font-size: 1.4rem; }
+    h2 { font-size: 1.1rem; margin-top: 2rem; }
+    .note { background: #f6f8fa; border-left: 4px solid #0969da; padding: .75rem 1rem; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d0d7de; padding: .4rem .6rem; text-align: left; }
+    th { background: #f6f8fa; }
+    dl { display: grid; grid-template-columns: max-content 1fr; gap: .3rem 1rem; }
+    dt { font-weight: 600; }
+    dd { margin: 0; }
+    code { background: #f6f8fa; padding: 0 .25rem; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <h1>Graylog AbuseIPDB Lookup — page de démonstration</h1>
+
+  <p class="note">
+    Cette page reproduit la structure HTML des résultats Graylog pour tester
+    l'extension sans instance Graylog.<br>
+    <em>This page mimics Graylog's search result markup so the extension can
+    be tested without a Graylog server.</em><br><br>
+    1. Saisissez une clé API AbuseIPDB dans l'onglet <strong>Paramètres</strong>
+    de l'extension (compte gratuit : <a href="https://www.abuseipdb.com/register">abuseipdb.com</a>).<br>
+    2. Laissez le champ par défaut <code>o365_audit_ClientIP</code>, puis
+    rechargez cette page.<br>
+    3. Seules les IP de la colonne <code>o365_audit_ClientIP</code> reçoivent
+    un badge ; celles de la colonne <code>source</code> sont ignorées.
+  </p>
+
+  <h2>Widget d'agrégation / Aggregation widget</h2>
+  <table>
+    <thead>
+      <tr><th>o365_audit_ClientIP</th><th>count()</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>8.8.8.8</td><td>42</td></tr>
+      <tr><td>1.1.1.1</td><td>17</td></tr>
+      <tr><td>2001:4860:4860::8888</td><td>5</td></tr>
+      <tr><td>192.168.1.20</td><td>3</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Tableau de messages / Message table</h2>
+  <table>
+    <thead>
+      <tr><th>timestamp</th><th>source</th><th>o365_audit_ClientIP</th><th>message</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>2026-10-02 08:14:03</td><td>9.9.9.9</td><td>9.9.9.9</td><td>UserLoggedIn</td></tr>
+      <tr><td>2026-10-02 08:12:47</td><td>10.0.0.4</td><td>208.67.222.222</td><td>UserLoginFailed</td></tr>
+      <tr><td>2026-10-02 08:09:21</td><td>10.0.0.4</td><td>10.0.0.4</td><td>MailItemsAccessed</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Détail d'un message / Message details</h2>
+  <dl>
+    <dt>timestamp</dt><dd>2026-10-02 08:14:03</dd>
+    <dt>source</dt><dd>9.9.9.9</dd>
+    <dt>o365_audit_ClientIP</dt><dd>9.9.9.9</dd>
+    <dt>message</dt><dd>UserLoggedIn</dd>
+  </dl>
+</body>
+</html>

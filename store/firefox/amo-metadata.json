@@ -1,0 +1,27 @@
+{
+  "categories": ["privacy-security", "web-development"],
+  "summary": {
+    "fr": "Score AbuseIPDB, ville et pays à côté des IP d'un champ Graylog précis (par défaut o365_audit_ClientIP), sans toucher au reste de la page.",
+    "en-US": "Shows AbuseIPDB reputation score, city and country next to the IPs of one Graylog field (default o365_audit_ClientIP), leaving the rest of the page untouched."
+  },
+  "description": {
+    "fr": "Extension pour analystes SOC qui enquêtent dans Graylog.\n\nElle repère un champ Graylog précis (par défaut <code>o365_audit_ClientIP</code>) et affiche à côté de chaque adresse IP un badge coloré avec son score d'abus AbuseIPDB, sa ville et son pays. Les autres IP de la page ne sont pas touchées.\n\n<b>Fonctionnalités</b>\n<ul><li>Badge par IP dans les widgets d'agrégation, les tableaux de messages et la vue détaillée d'un message : score, ville, pays, mention TOR.</li><li>Info-bulle au survol : nombre de signalements, ISP, ASN, domaine, type d'usage, whitelist, date du dernier signalement, lien vers AbuseIPDB.</li><li>Popup : IP de la page triées par risque, recherche manuelle d'une IP.</li><li>Champ configurable : n'importe quel champ Graylog contenant une IP.</li><li>Économe en quota : cache local (24 h par défaut), déduplication des requêtes, suivi de l'utilisation et du quota restant.</li><li>IPv4 et IPv6. Les IP privées (RFC 1918, loopback, link-local, ULA) ne sont jamais envoyées.</li></ul>\n<b>Prérequis</b>\nUne clé API AbuseIPDB (gratuite : 1 000 requêtes par jour) à saisir dans l'onglet Paramètres de l'extension.\n\n<b>Confidentialité</b>\nSeules les IP publiques du champ configuré sont envoyées, et uniquement à AbuseIPDB (réputation) et ipwho.is (géolocalisation). Pas de télémétrie, pas d'analytique. La clé API et le cache restent dans le navigateur.\n\nCode source (licence MIT) : https://github.com/eldriic/graylog-abuseipdb\n\n<i>Projet indépendant, non affilié à Graylog, Inc. ni à AbuseIPDB.</i>",
+    "en-US": "For SOC analysts investigating in Graylog. The extension interface is in French.\n\nIt looks for one specific Graylog field (default <code>o365_audit_ClientIP</code>) and adds a colour-coded badge next to each IP address with its AbuseIPDB abuse confidence score, city and country. Other IPs on the page are left alone.\n\n<b>Features</b>\n<ul><li>Per-IP badge in aggregation widgets, message tables and the message detail view: score, city, country, TOR flag.</li><li>Hover tooltip: number of reports, ISP, ASN, domain, usage type, whitelist status, last reported date, link to AbuseIPDB.</li><li>Toolbar popup: page IPs sorted by risk, manual IP lookup.</li><li>Configurable field: any Graylog field that holds an IP.</li><li>Quota-friendly: local cache (24 h by default), request de-duplication, usage and remaining-quota tracking.</li><li>IPv4 and IPv6. Private addresses (RFC 1918, loopback, link-local, ULA) are never sent.</li></ul>\n<b>Requirements</b>\nAn AbuseIPDB API key (free tier: 1,000 requests per day), entered in the extension's Settings tab.\n\n<b>Privacy</b>\nOnly public IPs from the configured field are sent, and only to AbuseIPDB (reputation) and ipwho.is (geolocation). No telemetry, no analytics. The API key and cache stay in the browser.\n\nSource code (MIT license): https://github.com/eldriic/graylog-abuseipdb\n\n<i>Independent project, not affiliated with Graylog, Inc. or AbuseIPDB.</i>"
+  },
+  "homepage": {
+    "fr": "https://github.com/eldriic/graylog-abuseipdb",
+    "en-US": "https://github.com/eldriic/graylog-abuseipdb"
+  },
+  "support_url": {
+    "fr": "https://github.com/eldriic/graylog-abuseipdb/issues",
+    "en-US": "https://github.com/eldriic/graylog-abuseipdb/issues"
+  },
+  "version": {
+    "license": "MIT",
+    "release_notes": {
+      "fr": "Première publication sur addons.mozilla.org.",
+      "en-US": "First release on addons.mozilla.org."
+    },
+    "approval_notes": "HOW TO TEST\n1. Create a free AbuseIPDB account and API key: https://www.abuseipdb.com/account/api\n2. Click the toolbar icon > 'Paramètres' (Settings) tab > paste the key > 'Tester la clé' (Test key) > save.\n3. Open the demo page that mimics Graylog's markup: https://eldriic.github.io/graylog-abuseipdb/demo/ (also in the source: docs/demo/index.html).\n4. Badges appear next to the IPs of the 'o365_audit_ClientIP' column only; the 'source' column is ignored. Hover a badge for details; the popup lists the page IPs.\n\nPERMISSIONS\n- Content script on <all_urls>: Graylog is self-hosted, so its URL differs for every organisation and cannot be listed in advance. The content script only reads the text of table headers (<th>) / definition terms (<dt>) to find the configured field name, then the IP in the matching cells. Nothing else from the page is read or sent.\n- api.abuseipdb.com: reputation lookups (requires the user's API key).\n- ipwho.is: city/region lookup (AbuseIPDB does not return the city).\n- storage: settings, API key, result cache and per-day request counter, all in storage.local.\n\nData collection: only public IP addresses from the configured field are sent to the two services above (declared as websiteContent). No telemetry.\n\nThe code is plain, unminified JavaScript with no build step other than merging manifests/base.json with manifests/firefox.json (scripts/build.mjs). Source: https://github.com/eldriic/graylog-abuseipdb"
+  }
+}

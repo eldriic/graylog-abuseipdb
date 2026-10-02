@@ -1,6 +1,6 @@
 {
   "name": "graylog-abuseipdb",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "private": true,
   "description": "Browser extension that enriches a Graylog IP field with AbuseIPDB reputation and geolocation.",
   "license": "MIT",
@@ -24,9 +24,10 @@
     "package:chrome": "web-ext build --source-dir dist/chrome --artifacts-dir artifacts --filename graylog-abuseipdb-chrome-{version}.zip --overwrite-dest",
     "start:firefox": "npm run build:firefox && web-ext run --source-dir dist/firefox",
     "start:chrome": "npm run build:chrome && web-ext run --target chromium --source-dir dist/chrome",
-    "sign:firefox": "npm run build:firefox && web-ext sign --channel unlisted --source-dir dist/firefox --artifacts-dir artifacts"
+    "sign:firefox": "npm run build:firefox && web-ext sign --channel unlisted --source-dir dist/firefox --artifacts-dir artifacts",
+    "submit:firefox": "npm run lint && web-ext sign --channel listed --amo-metadata store/firefox/amo-metadata.json --approval-timeout 0 --source-dir dist/firefox --artifacts-dir artifacts"
   },
   "devDependencies": {
-    "web-ext": "^8.0.0"
+    "web-ext": "^10.7.0"
   }
 }
