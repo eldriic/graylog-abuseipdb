@@ -83,6 +83,9 @@ Récupérez l'archive du navigateur voulu dans les
 [Releases](https://github.com/eldriic/graylog-abuseipdb/releases), ou
 construisez-la vous-même (voir [Développement](#développement)).
 
+> 📘 **Guide pas à pas** (Chrome, Firefox, configuration, mise à jour,
+> dépannage) : [docs/INSTALL.md](docs/INSTALL.md).
+
 ### Chrome, Edge, Brave, Opera, Vivaldi
 
 1. Décompressez `graylog-abuseipdb-chrome-<version>.zip` (ou utilisez `dist/chrome`).
