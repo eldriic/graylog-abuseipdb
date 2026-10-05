@@ -5,6 +5,15 @@ Toutes les évolutions notables de ce projet sont documentées ici.
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) et le
 projet respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 
+## [1.5.1] - 2026-10-05
+
+### Modifié
+
+- Description de la fiche addons.mozilla.org en Markdown (AMO n'interprète
+  plus le HTML).
+- Première publication sur addons.mozilla.org des nouveautés de la 1.5.0
+  (numéro 1.5.0 déjà utilisé par une signature non listée).
+
 ## [1.5.0] - 2026-10-02
 
 ### Ajouté
@@ -128,6 +137,7 @@ projet respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 - Info-bulle détaillée et lien vers AbuseIPDB.
 - Page de paramètres : clé API, champ, historique, durée du cache.
 
+[1.5.1]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.5.1
 [1.5.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.5.0
 [1.4.1]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.4.1
 [1.4.0]: https://github.com/eldriic/graylog-abuseipdb/releases/tag/v1.4.0
