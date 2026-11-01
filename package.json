@@ -29,6 +29,6 @@
     "submit:firefox": "npm run lint && web-ext sign --channel listed --amo-metadata store/firefox/amo-metadata.json --approval-timeout 0 --source-dir dist/firefox --artifacts-dir artifacts"
   },
   "devDependencies": {
-    "web-ext": "^10.7.0"
+    "web-ext": "^10.8.0"
   }
 }
